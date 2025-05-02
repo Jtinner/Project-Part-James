@@ -413,8 +413,16 @@ namespace MediaServer
 
                 while (this.running && handler.Connected && (bytesRead = fsFile.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    handler.Send(buffer, bytesRead, SocketFlags.None);
-                    bytesSent += bytesRead;
+                    try
+                    {
+                        handler.Send(buffer, bytesRead, SocketFlags.None);
+                        bytesSent += bytesRead;
+                    }
+                    catch (SocketException ex)
+                    {
+                        Console.WriteLine($"Client disconnected during send: {ex.Message}");
+                        break; // Exit the loop if the client disconnects
+                    }
                 }
             }
 
